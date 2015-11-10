@@ -21,7 +21,7 @@ setup(
     long_description='Utilizes ELO Rating system to predict',
                      'a student\'s RIT score and to update',
                      'a Khan exercise\'s item difficulty on',
-                     'the RIT scale.'
+                     'the RIT scale.',
 
     url='https://github.com/kimjam/pkaers',
 

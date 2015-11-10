@@ -4,7 +4,7 @@ python:
 sudo: false
 install: pip install coveralls flake8
 script:
-  - flake8 pkaaw
+  - flake8 pkaers
   - flake8 tests
-  - coverage run --source=pkaaw setup.py test
+  - coverage run --source=pkaers setup.py test
 after_success: coveralls
