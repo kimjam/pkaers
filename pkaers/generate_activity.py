@@ -35,7 +35,20 @@ def generate_activity(student,
 	itemdiffs_df = clean_dates(itemdiffs_df)
 
 	cutoff_date = itemdiffs_df['last_updated'][0]
-	# filter out activity before cutoff_date
+	# filter out map scores after cutoff_date, add email, khan student user_id
+	map_df = map_df[map_df['date_taken'] <= cutoff_date]
+
+	map_df = pd.merge(map_df,
+					  student_df[['id', 'email']],
+					  left_on='student_id',
+					  right_on='id',
+					  how='left')
+
+	map_df = pd.merge(map_df,
+					  khanstudent_df[['identity_email', 'student']],
+					  left_on='email',
+					  right_on='identity_email',
+					  how='left')
 
 	states_wide = pd.DataFrame(columns=['exercise', 'mastery1', 'mastery2',
 										'mastery3', 'practiced', 'student'])
@@ -49,3 +62,21 @@ def generate_activity(student,
 		state_wide.reset_index(level=0, inplace=True)
 		state_wide['student'] = stu
 		states_wide = states_wide.append(state_wide)
+
+	states_wide = pd.merge(states_wide,
+						   itemdiffs_df,
+						   left_on='exercise',
+						   right_on='slug',
+						   how='left')
+
+	map_df = map_df.groupby('student').agg(lambda x:
+										   x.iloc[x.date_taken.values.argmax()])
+
+	map_df.reset_index(level=0, inplace=True)
+
+	states_wide = pd.merge(states_wide,
+						   map_df[['student', 'scale_score']],
+						   on='student',
+						   how='left')
+
+	return states_wide
