@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from datetime import datetime
 from math import exp
 
@@ -60,7 +59,7 @@ def khan_elo(
                           how='left')
 
         map_df = map_df.groupby('student').agg(
-            lambda x:x.iloc[x.date_taken.values.argmax()]
+            lambda x: x.iloc[x.date_taken.values.argmax()]
         )
 
         map_df.reset_index(level=0, inplace=True)
@@ -79,7 +78,7 @@ def khan_elo(
                           how='left')
 
         map_df = map_df.groupby('student').agg(
-            lambda x:x.iloc[x.date_taken.values.argmax()]
+            lambda x: x.iloc[x.date_taken.values.argmax()]
         )
 
         map_df.reset_index(level=0, inplace=True)
@@ -93,7 +92,8 @@ def khan_elo(
     for stu in khanstudent_df['student'].tolist():
         cutoff_date = map_df['date_taken'][map_df.student == stu].tolist()[0]
         state = exerstates_df[
-            (exerstates_df.student == stu) & (exerstates_df.date >= cutoff_date)
+            (exerstates_df.student == stu) & \
+            (exerstates_df.date >= cutoff_date)
         ]
         state_wide = state.pivot(
             index='exercise',
@@ -158,14 +158,15 @@ def khan_elo(
 
                 for i in range(len(opponents)):
                     diff += (
-                        W * (opponents.iloc[i]['item_win'] - \
-                        (exp(diff - opponents.iloc[i]['scale_score']) / \
-                        (1 + exp(diff - opponents.iloc[i]['scale_score']))
-                        ))
+                        W * (
+                        opponents.iloc[i]['item_win'] -
+                        (exp(diff - opponents.iloc[i]['scale_score']) /
+                        (1 + exp(diff - opponents.iloc[i]['scale_score'])))
+                        )
                     )
 
                 itemdiffs_df.loc[:, 'rit_estimate'][itemdiffs_df.slug == slug]\
-                = round(diff * 10 + 200, 2)
+                    = round(diff * 10 + 200, 2)
 
         return itemdiffs_df.to_dict('records')
 
@@ -189,9 +190,10 @@ def khan_elo(
                         lambda x: (x - 200) / 10
                     )
 
-                    opponents['rit_estimate'] = opponents['rit_estimate'].apply(
-                        lambda x: (x - 200) / 10
-                    )
+                    opponents['rit_estimate'] = opponents['rit_estimate'].\
+                        apply(
+                            lambda x: (x - 200) / 10
+                        )
                     start_est = (start_est - 200) / 10
                     for i in range(len(opponents)):
                         spread = abs(
@@ -203,11 +205,13 @@ def khan_elo(
                             W = 0.05
 
                         start_est += (
-                            W * (opponents.iloc[i]['student_win'] - \
-                            (exp(start_est - opponents.iloc[i]['rit_estimate']) \
-                            /(1 + exp(start_est - \
+                            W * (
+                            opponents.iloc[i]['student_win'] -
+                            (exp(start_est - opponents.iloc[i]['rit_estimate'])
+                            / (1 + exp(start_est -
                             opponents.iloc[i]['rit_estimate'])
-                            )))
+                            ))
+                            )
                         )
 
                     predictions.append({
