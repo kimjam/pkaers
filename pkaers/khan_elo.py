@@ -92,7 +92,7 @@ def khan_elo(
     for stu in khanstudent_df['student'].tolist():
         cutoff_date = map_df['date_taken'][map_df.student == stu].tolist()[0]
         state = exerstates_df[
-            (exerstates_df.student == stu) & \
+            (exerstates_df.student == stu) &
             (exerstates_df.date >= cutoff_date)
         ]
         state_wide = state.pivot(
@@ -159,9 +159,17 @@ def khan_elo(
                 for i in range(len(opponents)):
                     diff += (
                         W * (
-                        opponents.iloc[i]['item_win'] -
-                        (exp(diff - opponents.iloc[i]['scale_score']) /
-                        (1 + exp(diff - opponents.iloc[i]['scale_score'])))
+                            opponents.iloc[i]['item_win'] -
+                            (
+                                exp(diff - opponents.iloc[i]['scale_score']) /
+                                (
+                                    1 +
+                                    exp(
+                                        diff -
+                                        opponents.iloc[i]['scale_score']
+                                    )
+                                )
+                            )
                         )
                     )
 
@@ -206,11 +214,19 @@ def khan_elo(
 
                         start_est += (
                             W * (
-                            opponents.iloc[i]['student_win'] -
-                            (exp(start_est - opponents.iloc[i]['rit_estimate'])
-                            / (1 + exp(start_est -
-                            opponents.iloc[i]['rit_estimate'])
-                            ))
+                                opponents.iloc[i]['student_win'] -
+                                (
+                                    exp(
+                                        start_est -
+                                        opponents.iloc[i]['rit_estimate']
+                                    ) / (
+                                        1 +
+                                        exp(
+                                            start_est -
+                                            opponents.iloc[i]['rit_estimate']
+                                        )
+                                    )
+                                )
                             )
                         )
 
