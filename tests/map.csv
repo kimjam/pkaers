@@ -1,0 +1,4 @@
+_state,assessment_test_name,created,date_taken,id,name,perf_record,scale_score,school_id,student_id,subject
+<django.db.models.base.ModelState object at 0x7f81a9bb8dd0>,MAP,2015-11-05 21:13:57.676783+00:00,2015-01-15,4,pkaw student,1,210.00,1,4,Mathematics
+<django.db.models.base.ModelState object at 0x7f81a9bb8e50>,MAP,2015-11-05 21:15:18.517525+00:00,2015-05-26,5,test student,1,200.00,1,5,Mathematics
+<django.db.models.base.ModelState object at 0x7f81a9bb8ed0>,MAP,2015-11-10 14:47:52.516733+00:00,2015-06-30,6,pkaw student,2,205.00,1,4,Mathematics

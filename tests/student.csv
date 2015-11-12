@@ -1,0 +1,3 @@
+_state,created,email,id,local_id,name,owner_id,phone_number,uuid
+<django.db.models.base.ModelState object at 0x7f81a9bb89d0>,2015-11-05 21:12:33.790318+00:00,pkawtest@mailinator.com,4,1,pkaw student,,,3eea736f-60a2-4271-856a-d0f48d0491c9
+<django.db.models.base.ModelState object at 0x7f81a9bb8a50>,2015-11-05 21:12:53.150587+00:00,jamesykim10@gmail.com,5,2,test student,1.0,,167635ec-45a3-4fca-9d53-a1241c91148f
