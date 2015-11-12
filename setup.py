@@ -18,10 +18,9 @@ setup(
     version='0.0.2',
 
     description='Python Khan Academy ELO Rating System',
-    long_description='Utilizes ELO Rating system to predict',
-                     'a student\'s RIT score and to update',
-                     'a Khan exercise\'s item difficulty on',
-                     'the RIT scale.',
+    long_description='Utilizes ELO Rating system to predict '
+                     'RIT scores and to update a Khan exercise difficulties '
+                     'on the RIT scale.',
 
     url='https://github.com/kimjam/pkaers',
 
@@ -47,7 +46,7 @@ setup(
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
 
-    install_requires=['numpy', 'pandas', 'PyYAML'],
+    install_requires=['numpy', 'pandas'],
 
     # Entry points for command line integration
     entry_points="",
