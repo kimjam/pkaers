@@ -9,6 +9,7 @@ def khan_elo(
         khanstudent,
         exerstates,
         itemdiffs,
+        khanpred,
         update):
     """
     student list of dictionaries containing student info
@@ -90,7 +91,16 @@ def khan_elo(
     )
 
     for stu in khanstudent_df['student'].tolist():
-        cutoff_date = map_df['date_taken'][map_df.student == stu].tolist()[0]
+        cutoff_date = None
+        if not khanpred_df.empty:
+            cutoff_date = khanpred_df['last_updated'][
+                khanpred_df.student == stu
+            ].tolist()[0]
+
+        if not cutoff_date:
+            cutoff_date = map_df['date_taken'][map_df.student == stu].\
+                tolist()[0]
+
         state = exerstates_df[
             (exerstates_df.student == stu) &
             (exerstates_df.date >= cutoff_date)
