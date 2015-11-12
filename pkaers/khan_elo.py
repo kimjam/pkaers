@@ -9,17 +9,18 @@ def khan_elo(
         khanstudent,
         exerstates,
         itemdiffs,
-        khanpred,
-        update):
+        update,
+        khanpred=None):
     """
     student list of dictionaries containing student info
     map_data list of dictionaries containing student's Math MAP records
     khanstudent list of dictionaries containing student's khan info
     exerstates list of dictionaries containing exercise state changes
     itemdiffs list of dictionaries containing prior item difficulty estimates
-    khanpred list of dictionaries containg khan based RIT predictions
     update set to 'items' to update item difficulties and 'students' to update
     student proficiencies
+    khanpred list of dictionaries containg khan based RIT predictions if update
+    is set to students
     """
 
     student_df = pd.DataFrame(student)
@@ -43,48 +44,23 @@ def khan_elo(
     itemdiffs_df = clean_dates(itemdiffs_df)
     khanpred_df = clean_dates(khanpred_df)
 
-    if update == 'items':
-        cutoff_date = itemdiffs_df['last_updated'][0]
-        # filter out map scores after cutoff_date, add email,
-        # khan student user_id
-        map_df = map_df[map_df['date_taken'] <= cutoff_date]
+    map_df = pd.merge(map_df,
+                      student_df[['id', 'email']],
+                      left_on='student_id',
+                      right_on='id',
+                      how='left')
 
-        map_df = pd.merge(map_df,
-                          student_df[['id', 'email']],
-                          left_on='student_id',
-                          right_on='id',
-                          how='left')
+    map_df = pd.merge(map_df,
+                      khanstudent_df[['identity_email', 'student']],
+                      left_on='email',
+                      right_on='identity_email',
+                      how='left')
 
-        map_df = pd.merge(map_df,
-                          khanstudent_df[['identity_email', 'student']],
-                          left_on='email',
-                          right_on='identity_email',
-                          how='left')
+    map_df = map_df.groupby('student').agg(
+        lambda x: x.iloc[x.date_taken.values.argmax()]
+    )
 
-        map_df = map_df.groupby('student').agg(
-            lambda x: x.iloc[x.date_taken.values.argmax()]
-        )
-
-        map_df.reset_index(level=0, inplace=True)
-        exerstates_df = exerstates_df[exerstates_df['date'] >= cutoff_date]
-    elif update == 'students':
-        map_df = pd.merge(map_df,
-                          student_df[['id', 'email']],
-                          left_on='student_id',
-                          right_on='id',
-                          how='left')
-
-        map_df = pd.merge(map_df,
-                          khanstudent_df[['identity_email', 'student']],
-                          left_on='email',
-                          right_on='identity_email',
-                          how='left')
-
-        map_df = map_df.groupby('student').agg(
-            lambda x: x.iloc[x.date_taken.values.argmax()]
-        )
-
-        map_df.reset_index(level=0, inplace=True)
+    map_df.reset_index(level=0, inplace=True)
 
     states_wide = pd.DataFrame(
         columns=[
@@ -159,7 +135,7 @@ def khan_elo(
                     lambda x: (x - 200) / 10
                 )
                 itemdiffs_df.loc[:, 'matches'][itemdiffs_df.slug == slug] += (
-                    matches
+                    len(opponents)
                 )
                 diff = (diff - 200) / 10
                 if (matches + len(opponents)) > 100:
