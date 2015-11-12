@@ -6,5 +6,5 @@ install: pip install coveralls flake8
 script:
   - flake8 pkaers
   - flake8 tests
-  # - coverage run --source=pkaers setup.py test
+  - coverage run --source=pkaers setup.py test
 after_success: coveralls
