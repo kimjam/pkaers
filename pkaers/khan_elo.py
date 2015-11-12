@@ -27,6 +27,7 @@ def khan_elo(
     khanstudent_df = pd.DataFrame(khanstudent)
     exerstates_df = pd.DataFrame(exerstates)
     itemdiffs_df = pd.DataFrame(itemdiffs)
+    khanpred_df = pd.DataFrame(khanpred)
 
     def clean_dates(df):
         cols = df.select_dtypes(include=['datetime64[ns, UTC]']).columns
@@ -40,6 +41,7 @@ def khan_elo(
     khanstudent_df = clean_dates(khanstudent_df)
     exerstates_df = clean_dates(exerstates_df)
     itemdiffs_df = clean_dates(itemdiffs_df)
+    khanpred_df = clean_dates(khanpred_df)
 
     if update == 'items':
         cutoff_date = itemdiffs_df['last_updated'][0]
