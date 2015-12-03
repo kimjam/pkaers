@@ -253,7 +253,7 @@ def khan_elo(
 
                     predictions.append({
                         'student': student,
-                        'rit_prediction': ritt_est,
+                        'rit_prediction': rit_est,
                         'last_updated': datetime.strftime(
                             datetime.now(), format='%Y-%m-%d %H:%M:%S'
                         )
