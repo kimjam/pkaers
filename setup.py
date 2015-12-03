@@ -46,7 +46,7 @@ setup(
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
 
-    install_requires=['numpy', 'pandas'],
+    install_requires=['numpy', 'pandas', 'pytz'],
 
     # Entry points for command line integration
     entry_points="",

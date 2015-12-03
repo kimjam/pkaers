@@ -1,6 +1,8 @@
+import numpy as np
 import pandas as pd
 from datetime import datetime
 from math import exp
+import pytz
 
 
 def khan_elo(
@@ -65,20 +67,40 @@ def khan_elo(
     states_wide = pd.DataFrame(
         columns=[
             'exercise', 'mastery1', 'mastery2',
-            'mastery3', 'practiced', 'student']
+            'mastery3', 'practiced', 'student'
+        ]
     )
 
+    start_est = []
     for stu in khanstudent_df['student'].tolist():
         if update == 'students':
-            cutoff_date = None
-            if not khanpred_df.empty:
-                cutoff_date = khanpred_df['last_updated'][
-                    khanpred_df.student == stu
-                ].tolist()[0]
+            cutoff_date = khanpred_df['last_updated'][
+                khanpred_df.student == stu
+            ].tolist()
 
-            if not cutoff_date:
+            if cutoff_date:
+                start_est.append(
+                    khanpred_df['rit_prediction'][
+                        khanpred_df.student == stu
+                    ].tolist()[0]
+                )
+
+            else:
                 cutoff_date = map_df['date_taken'][map_df.student == stu].\
-                    tolist()[0]
+                    tolist()
+                start_est.apend(
+                    float(
+                        map_df[map_df.student == student][
+                            'scale_score'
+                        ].tolist()[0]
+                    )
+                )
+
+            if cutoff_date:
+                cutoff_date = cutoff_date[0]
+            else:
+                cutoff_date = datetime.now()
+                start_est.append(np.NAN)
 
         state = exerstates_df[
             (exerstates_df.student == stu) &
@@ -90,8 +112,17 @@ def khan_elo(
             values='date'
         )
 
-        state_wide.reset_index(level=0, inplace=True)
-        state_wide['student'] = stu
+        if state_wide.empty:
+            state_wide = pd.DataFrame(
+                columns=[
+                    'exercise', 'mastery1', 'mastery2',
+                    'mastery3', 'practiced', 'student'
+                ]
+            )
+        else:
+            state_wide.reset_index(level=0, inplace=True)
+            state_wide['student'] = stu
+
         states_wide = states_wide.append(state_wide)
 
     states_wide = pd.merge(
@@ -120,6 +151,8 @@ def khan_elo(
     states_wide['scale_score'] = states_wide['scale_score'].apply(
         lambda x: float(x)
     )
+
+    start_est = dict(zip(khanstudent_df['student'].tolist(), start_est))
 
     if update == 'items':
         for slug in itemdiffs_df['slug'].tolist():
@@ -171,15 +204,15 @@ def khan_elo(
         predictions = []
         for student in khanstudent_df['student'].tolist():
             opponents = states_wide[states_wide.student == student]
-            start_est = float(
-                map_df[map_df.student == student]['scale_score'].tolist()[0]
-            )
+            rit_est = start_est[student]
             matches = float(len(opponents))
-            if len(opponents) == 0:
+            if len(opponents) == 0 or np.isnan(rit_est):
                 predictions.append({
                     'student': student,
                     'rit_prediction': None,
-                    'last_updated': datetime.now()
+                    'last_updated': datetime.strftime(
+                        datetime.now(), format='%Y-%m-%d %H:%M:%S'
+                    )
                 })
             else:
                 if (sum(opponents['student_win']) / matches) >= 0.8:
@@ -191,27 +224,27 @@ def khan_elo(
                         apply(
                             lambda x: (x - 200) / 10
                         )
-                    start_est = (start_est - 200) / 10
+                    rit_est = (rit_est - 200) / 10
                     for i in range(len(opponents)):
                         spread = abs(
-                            start_est - opponents.iloc[i]['rit_estimate']
+                            rit_est - opponents.iloc[i]['rit_estimate']
                         )
                         if spread >= .2:
                             W = 0.2
                         else:
                             W = 0.05
 
-                        start_est += (
+                        rit_est += (
                             W * (
                                 opponents.iloc[i]['student_win'] -
                                 (
                                     exp(
-                                        start_est -
+                                        rit_est -
                                         opponents.iloc[i]['rit_estimate']
                                     ) / (
                                         1 +
                                         exp(
-                                            start_est -
+                                            rit_est -
                                             opponents.iloc[i]['rit_estimate']
                                         )
                                     )
@@ -221,14 +254,20 @@ def khan_elo(
 
                     predictions.append({
                         'student': student,
-                        'rit_prediction': start_est,
-                        'last_updated': datetime.now()
+                        'rit_prediction': ritt_est,
+                        'last_updated': datetime.strftime(
+                            datetime.now(), format='%Y-%m-%d %H:%M:%S'
+                        )
+
                     })
                 else:
                     predictions.append({
                         'student': student,
                         'rit_prediction': None,
-                        'last_updated': datetime.now()
+                        'last_updated': datetime.strftime(
+                            datetime.now(), format='%Y-%m-%d %H:%M:%S'
+                        )
+
                     })
 
         return predictions
