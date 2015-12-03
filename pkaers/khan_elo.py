@@ -257,7 +257,6 @@ def khan_elo(
                         'last_updated': datetime.strftime(
                             datetime.now(), format='%Y-%m-%d %H:%M:%S'
                         )
-
                     })
                 else:
                     predictions.append({
@@ -266,7 +265,6 @@ def khan_elo(
                         'last_updated': datetime.strftime(
                             datetime.now(), format='%Y-%m-%d %H:%M:%S'
                         )
-
                     })
 
         return predictions
